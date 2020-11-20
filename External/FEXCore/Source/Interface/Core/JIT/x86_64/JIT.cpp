@@ -909,6 +909,9 @@ void JITCore::CreateCustomDispatch(FEXCore::Core::InternalThreadState *Thread) {
     // Store RIP to the context state
     mov(qword [STATE + offsetof(FEXCore::Core::InternalThreadState, State.State.rip)], rsi);
 
+    // load static regs
+    FillStaticRegs();
+    
     // Back to the loop top now
     jmp(LoopTop);
   }

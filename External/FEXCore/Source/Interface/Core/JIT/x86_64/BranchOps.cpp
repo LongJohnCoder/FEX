@@ -31,6 +31,9 @@ DEF_OP(SignalReturn) {
 }
 
 DEF_OP(CallbackReturn) {
+  // spill back to CTX
+  SpillStaticRegs();
+  
   // Adjust the stack first for a regular return
   if (SpillSlots) {
     add(rsp, SpillSlots * 16 + 8 + 8); // + 8 to consume return address
@@ -209,8 +212,12 @@ DEF_OP(Thunk) {
 
   mov(rdi, GetSrc<RA_64>(Op->Header.Args[0].ID()));
 
+  SpillStaticRegs();
+
   mov(rax, reinterpret_cast<uintptr_t>(Op->ThunkFnPtr));
   call(rax);
+
+  FillStaticRegs();
 
   if (NumPush & 1)
     add(rsp, 8); // Align
